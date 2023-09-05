@@ -60,3 +60,6 @@ FROM
     films
 RIGHT JOIN film_reviews USING (film_id)
 WHERE title ISNULL;
+
+DROP TABLE film_reviews;
+DROP TABLE films;

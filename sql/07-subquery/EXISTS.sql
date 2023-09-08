@@ -10,6 +10,7 @@
     - The EXISTS accepts an argument which is a subquery.
     - If the subquery returns at least one row, the result of EXISTS is true. In case the subquery returns no row,
         the result is of EXISTS is false.
+    - The EXISTS operator is often used with the correlated query.
     - The result of EXISTS operator depends on whether any row returned by the subquery, and not on the row
         contents. Therefore, columns that appear on the SELECT clause of the subquery are not important.
     - The NOT operator negates the result of the EXISTS operator. The NOT EXISTS is opposite to EXISTS. It means

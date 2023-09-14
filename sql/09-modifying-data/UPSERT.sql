@@ -15,7 +15,7 @@
     - In this statement, the target can be one of the following:
         -  (column_name) – a column name.
         -  ON CONSTRAINT constraint_name – where the constraint name could be the name of the UNIQUE constraint.
-        -  WHERE predicate – a WHERE clause with a predicate.}
+        -  WHERE predicate – a WHERE clause with a predicate.
     - The action can be one of the following:
         -  DO NOTHING – means do nothing if the row already exists in the table.
         -  DO UPDATE SET column_1 = value_1, .. WHERE condition – update some fields in the table.

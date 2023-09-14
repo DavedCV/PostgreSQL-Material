@@ -8,7 +8,7 @@
 /*
     - A grouping set is a set of columns by which you group by using the GROUP BY clause.
     - Suppose that you want to get different grouping sets from a  table by using a single query. To achieve
-        this, you may use the UNION ALL to combine all the queries above. Even though this works as you
+        this, you may use the UNION ALL to combine all the queries. Even though this works as you
         expected, it has two main problems: First, it is quite lengthy, Second, it has a performance issue
         because PostgreSQL has to scan the table separately for each query.
     - To make it more efficient, PostgreSQL provides the GROUPING SETS clause which is the

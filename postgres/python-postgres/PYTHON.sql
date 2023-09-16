@@ -1,21 +1,8 @@
+/*
+    - create table and insert data from python -------------------------------------------------------------------------
 
--- https://www.pg4e.com/lectures/06-Python.sql
-
--- You might want to clean up tables from previous assignments
--- so your PostgreSQL server does not run out of space
-
--- Required to be installed in your Python
-
--- install psycopg2 (if needed)
--- pip3 install psycopg2    # (or pip)
-
--- wget https://www.pg4e.com/code/simple.py
-
--- wget https://www.pg4e.com/code/hidden-dist.py
--- copy hidden-dist.py to hidden.py
--- edit hidden.py and put in your credentials
-
--- python3 simple.py
+    - python3 db-connection.py
+*/
 
 -- The program will do these two commands and insert some rows
 DROP TABLE IF EXISTS pythonfun CASCADE;
@@ -24,25 +11,21 @@ CREATE TABLE pythonfun (id SERIAL, line TEXT);
 -- To check the results, use psql and look at the pythonfun table
 SELECT * FROM pythonfun;
 
+/*
+    -- create table and insert book paragraphs -------------------------------------------------------------------------
 
+    - Get a book from Gutenberg
+    - wget http://www.gutenberg.org/cache/epub/19337/pg19337.txt
 
--- Get a book from Gutenberg
+    - python3 loadbook.py
+    - Enter book file (i.e. pg19337.txt): pg19337.txt
 
--- wget http://www.gutenberg.org/cache/epub/19337/pg19337.txt
+    - DROP TABLE IF EXISTS pg19337 CASCADE;
+    - CREATE TABLE pg19337 (id SERIAL, body TEXT);
+    - 100 loaded...
 
--- wget https://www.pg4e.com/code/loadbook.py
--- wget https://www.pg4e.com/code/myutils.py
--- wget https://www.pg4e.com/code/hidden-dist.py
--- mv hidden-dist.py hidden.py
--- edit hidden.py and put in your credentials
-
--- python3 loadbook.py
--- Enter book file (i.e. pg19337.txt): pg19337.txt
--- DROP TABLE IF EXISTS pg19337 CASCADE;
--- CREATE TABLE pg19337 (id SERIAL, body TEXT);
--- 100 loaded...
-
--- Loaded 814 paragraphs 3853 lines 178898 characters
+    - Loaded 814 paragraphs 3853 lines 178898 characters
+*/
 
 -- We could have done this before we did all the inserts..
 CREATE INDEX pg19337_gin ON pg19337 USING gin(to_tsvector('english', body));
@@ -54,28 +37,17 @@ EXPLAIN ANALYZE SELECT body FROM pg19337  WHERE to_tsquery('english', 'goose') @
 SELECT count(body) FROM pg19337  WHERE to_tsquery('english', 'tiny <-> tim') @@ to_tsvector('english', body);
 EXPLAIN ANALYZE SELECT body FROM pg19337  WHERE to_tsquery('english', 'tiny <-> tim') @@ to_tsvector('english', body) LIMIT 5;
 
--- Using a natural language index on an email corpus
+/*
+    - Using a natural language index on an email corpus ----------------------------------------------------------------
 
--- http://mbox.dr-chuck.net/sakai.devel/1/2
+    - http://mbox.dr-chuck.net/sakai.devel/
 
--- wget https://www.pg4e.com/code/gmane.py
--- wget https://www.pg4e.com/code/datecompat.py
--- wget https://www.pg4e.com/code/hidden-dist.py
--- mv hidden-dist.py hidden.py
--- edit hidden.py and put in your credentials
-
--- python3 gmane.py
--- Pulls data from the web and puts it into messages table
--- Load at least 300 messages (can be stopped and started)
-
--- CREATE TABLE IF NOT EXISTS messages
-
--- CREATE TABLE IF NOT EXISTS messages
---    (id SERIAL, email TEXT, sent_at TIMESTAMPTZ,
---     subject TEXT, headers TEXT, body TEXT)
+    - python3 gmane.py
+    - Pulls data from the web and puts it into messages table
+    - Load at least 300 messages (can be stopped and started)
+*/
 
 -- Making a language oriented inverted index in mail messages
-
 CREATE INDEX messages_gin ON messages USING gin(to_tsvector('english', body));
 
 SELECT to_tsvector('english', body) FROM messages LIMIT 1;
@@ -107,9 +79,9 @@ CREATE INDEX messages_gist ON messages USING gist(to_tsvector('english', body));
 DROP INDEX messages_gist;
 
 ---
-
 SELECT subject, sender FROM messages
 WHERE to_tsquery('english', 'monday') @@ to_tsvector('english', body);
+
 EXPLAIN ANALYZE SELECT subject, sender
 FROM messages WHERE to_tsquery('english', 'monday') @@ to_tsvector('english', body);
 
@@ -154,7 +126,6 @@ WHERE websearch_to_tsquery('english', '-personal learning') @@ to_tsvector('engl
 LIMIT 10;
 
 -- https://www.postgresql.org/docs/12/textsearch-controls.html#TEXTSEARCH-RANKING
-
 SELECT id, subject, sender,
   ts_rank(to_tsvector('english', body), to_tsquery('english', 'personal & learning')) as ts_rank
 FROM messages
@@ -193,4 +164,3 @@ CREATE INDEX messages_from ON messages (:zap);
 EXPLAIN ANALYZE SELECT :zap FROM messages where :zap = 'john@caret.cam.ac.uk';
 
 -- https://www.postgresql.org/docs/current/textsearch-indexes.html
-

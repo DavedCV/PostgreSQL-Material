@@ -43,7 +43,7 @@ SELECT COUNT(*) FROM jtrack WHERE body @> ('{"name": "Summer Nights"}'::jsonb);
 UPDATE jtrack SET body = body || '{"favorite": "yes"}' WHERE (body->'count')::int > 200;
 
 -- Should see some with and without "favorite"
-SELECT body FROM jtrack WHERE (body->'count')::int > 160 LIMIT 5;
+SELECT body FROM jtrack WHERE (body->'count')::int > 200 LIMIT 5;
 
 -- We have an operator to check is a tag is present
 SELECT COUNT(*) FROM jtrack WHERE body ? 'favorite';

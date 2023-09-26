@@ -1,11 +1,19 @@
+import java.sql.DriverManager;
 import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
+
+        /*
+        DriverManager.drivers().forEach(
+                driver -> System.out.println(driver.toString())
+        );
+        */
+
         App app = new App();
 
         // app.getActorCount();
-        app.getActors();
+        //app.getActors();
         // app.getActorById(100);
         // int davidId = app.insertActor(new Actor("David", "Castrillon"));
 
@@ -21,6 +29,11 @@ public class Main {
         // app.updateLastName(davidId, "Vallejo");
         // app.getActorById(davidId);
 
-        // app.deleteActor(202);
+        // ok transaction
+        // app.addActorAndAssignFilm(new Actor("Bruce", "Lee"), 1);
+
+        // fail transaction
+        app.addActorAndAssignFilm(new Actor("Lily", "Lee"), 9999);
+
     }
 }

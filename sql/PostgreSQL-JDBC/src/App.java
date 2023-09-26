@@ -1,5 +1,7 @@
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.List;
+import java.util.ServiceLoader;
 
 public class App {
 
@@ -184,6 +186,71 @@ public class App {
 
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+        }
+    }
+
+    // Use transactions to insert and actor and assign him to a specific film
+    public void addActorAndAssignFilm(Actor actor, int filmId) {
+        String SQLInsertActor = "INSERT INTO actor (first_name, last_name) VALUES (?, ?)";
+        String SQLAssignActor = "INSERT INTO film_actor (actor_id, film_id) VALUES (?, ?)";
+        int actorId = 0;
+
+        // this code could be prettier if we dont use try with resources
+        try (
+            Connection conn = connect();
+            PreparedStatement pstmt = conn .prepareStatement(SQLInsertActor, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement pstmt2 = conn.prepareStatement(SQLAssignActor);
+        ) {
+
+            ResultSet rs = null;
+
+            try {
+                // basically enable transaction mode
+                conn.setAutoCommit(false);
+
+                // set prepared parameters
+                pstmt.setString(1, actor.getFirstName());
+                pstmt.setString(2, actor.getLastName());
+
+                // get the number of affected rows after the update
+                int affectedRows = pstmt.executeUpdate();
+                // get actor id
+                rs = pstmt.getGeneratedKeys();
+
+                if (affectedRows > 0) {
+                    if (rs.next()) {
+                        actorId = rs.getInt(1);
+                        if (actorId > 0) {
+                            pstmt2.setInt(1, actorId);
+                            pstmt2.setInt(2, filmId);
+                            pstmt2.executeUpdate();
+                        }
+                    }
+                } else {
+                    // rollback the transaction if the insert failed
+                    conn.rollback();
+                }
+
+                // commit the transaction if everything is fine
+                conn.commit();
+
+                System.out.printf("The actor was inserted with id %d and " +
+                        "assigned to the film %d%n", actorId, filmId);
+
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+
+                System.out.println("Rolling back the transaction...");
+                try {
+                    conn.rollback();
+                } catch (SQLException error) {
+                    System.out.println(error.getMessage());
+                }
+            } finally {
+                rs.close();
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
         }
     }
 }
